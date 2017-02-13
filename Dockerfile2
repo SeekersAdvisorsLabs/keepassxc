@@ -1,0 +1,34 @@
+FROM phusion/baseimage:0.9.18
+
+MAINTAINER Mael Auzias <docker@mael.auzias.net>
+MAINTAINER JBCebe <jbcebe@seekersadvisors.com>
+
+LABEL Description="This image is used to run KeePassXC: cross platform community driven port of the windows application “Keepass Password Safe” (GPL) available at https://github.com/keepassxreboot/keepassxc"
+
+RUN apt-get update && apt-get install -y \
+      git ca-certificates \
+      build-essential cmake libmicrohttpd-dev libxi-dev libxtst-dev qtbase5-dev libqt5x11extras5-dev qttools5-dev qttools5-dev-tools libgcrypt20-dev zlib1g-dev \
+      --no-install-recommends \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+ENV HOME=/home/keepassxreboot \
+    USER=keepassxreboot
+
+RUN adduser -q --disabled-password $USER \
+ && chown -R $USER $HOME \
+ && cd /home/keepassxreboot \
+ && git clone https://github.com/keepassxreboot/keepassxc.git \
+ && cd keepassxc \
+ && git checkout $(git describe --tags $(git rev-list --tags --max-count=1)) \
+ && cmake -DWITH_XC_AUTOTYPE=ON -DWITH_XC_HTTP=ON -DCMAKE_BUILD_TYPE=Release \
+ && make -j4 \
+ && make install \
+ && make clean \
+ && cd .. \
+ && rm -rf keepassxc/*
+
+WORKDIR $HOME
+USER $USER
+
+ENTRYPOINT keepassxc
