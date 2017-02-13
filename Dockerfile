@@ -14,7 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-FROM ubuntu:14.04
+FROM phusion/baseimage:0.9.18
+
+# Use baseimage-docker's init system.
+CMD ["/sbin/my_init"]
 
 RUN set -x \
     && apt-get update \
@@ -51,4 +54,6 @@ WORKDIR /keepassxc
 ENV CMAKE_PREFIX_PATH=/opt/qt58/lib/cmake
 ENV LD_LIBRARY_PATH=/opt/qt58/lib
 RUN set -x \
-    && echo /opt/qt58/lib > /etc/ld.so.conf.d/qt58.conf
+    && echo /opt/qt58/lib > /etc/ld.so.conf.d/qt58.conf \
+    apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

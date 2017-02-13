@@ -1,0 +1,17 @@
+version: '2'
+services:
+  keepassxc:
+    build: .
+    image: keepassxreboot/keepassxc:2.1.1
+    stdin_open: true
+    tty: true
+    command: /bin/bash -l -c "cd src; ./docker-starter.sh"
+    environment:
+      - DISPLAY 
+      - X_USER=$USER
+      - X_UID=$UID
+      - X_GID=$GID
+    volumes:
+      - ~/Documents/keepass:/kees
+      - .:/keepassxc/src
+      - /tmp/.X11-unix:/tmp/.X11-unix
